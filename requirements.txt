@@ -1,8 +1,0 @@
-#Requirements
-
-Flask
-flask-cors
-gunicorn
-google-cloud-firestore
-textblob
-Pillow
