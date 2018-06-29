@@ -6,7 +6,7 @@ import google.cloud
 import logging
 import datetime
 import requests
-from imgHandler import upload_to_storage
+#from imgHandler import upload_to_storage
 from google.cloud import firestore
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./service.json"
@@ -22,6 +22,9 @@ global positives_cache_expire_at
 positives_cache = []
 positives_cache_expire_at = ''
 
+def upload_to_storage(a,b):
+    return "test";
+
 def add_to_fb(card, imageFile):
     date_today = datetime.datetime.today()
     image_url = ''
@@ -30,9 +33,9 @@ def add_to_fb(card, imageFile):
     elif card['content']:
         content = card['content']
     card['date'] = date_today.strftime('%d/%m/%y')
-    card['id'] = content[:10].replace(' ', '-') + '/' + date_today.strftime('%Y/%m/%d/%H%M%S%f')
+    card['id'] = date_today.strftime('%Y/%m/%d/%H%M%S%f')+'/'+content[:16].replace(' ', '-')
     card['timestamp'] = date_today.strftime('%Y%m%d%H%M%S%f');
-    docId = card['id'].replace('/','-')
+    docId = content[:10].replace(' ', '-') + '-' + date_today.strftime('%Y-%m-%d-%H%M%S%f')
     
     if imageFile:
         image_url = upload_to_storage(imageFile,u'file',docId)
@@ -43,7 +46,6 @@ def add_to_fb(card, imageFile):
     if image_url:
         split = image_url.split('.appspot.com/')
         card['thumb'] = '.appspot.com/thumb_'.join(split)
-        print(card['thumb'])
     #if card['image']:
         #image_url = upload_to_storage(card['image'],u'url',docId)
         #card['image'] = image_url
@@ -65,9 +67,22 @@ def add_to_firestore(doc_ref, data):
 def get_posts():
     all_posts = []
     posts = positivesDB.order_by(u'timestamp', direction=firestore.Query.DESCENDING).get()
+    #posts = positivesDB.get()
     for doc in posts:
         all_posts.append(doc.to_dict())
 
+    return json.dumps(all_posts)
+
+def get_post_by_id(post_id):
+    
+    all_posts = []
+    print(post_id)
+    post = positivesDB.document(u'id', u'==', post_id).get()
+    #posts = positivesDB.get()
+    for doc in post:
+        print(doc)
+        all_posts.append(doc.to_dict())
+    print(post)
     return json.dumps(all_posts)
 
 def get_posts_backup(data):

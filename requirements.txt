@@ -2,7 +2,11 @@
 
 Flask
 flask-cors
-#gunicorn
+gunicorn==19.6.0
+google-cloud
 google-cloud-firestore
+google-cloud-storage
+grpcio
+grpcio-tools
 textblob
 Pillow
